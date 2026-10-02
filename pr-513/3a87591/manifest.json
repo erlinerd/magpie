@@ -1,0 +1,46 @@
+{
+  "summary": "用量页「请求」列表的筛选同步逻辑改了：切换时间范围后，如果已选的 Agent 或供应商在新范围里没有请求，magpie 现在会清空这个失效筛选、把分页复位到第一页并重新请求、在新结果返回后重绘列表，而不是像以前那样筛选器显示「全部」但列表仍停留在旧筛选的空结果上（此前只有网关密钥筛选是这么处理的）。",
+  "scenes": [
+    {
+      "title": "用量「请求」：时间范围与 Agent / 供应商筛选",
+      "shots": [
+        {
+          "file": "01-usage-requests.png",
+          "caption": "「请求」列表上方的时间范围，以及 Agent / 供应商 / 网关密钥三个筛选器",
+          "width": 2560
+        },
+        {
+          "file": "02-usage-requests.png",
+          "caption": "「请求」标签下的时间范围、搜索框与请求列表",
+          "width": 2560
+        },
+        {
+          "file": "03-period-7d.png",
+          "caption": "切到「7 天」后的时间范围与请求列表",
+          "width": 2560
+        },
+        {
+          "file": "04-period-30d.png",
+          "caption": "「30 天」下的时间范围与请求列表",
+          "width": 2560
+        },
+        {
+          "file": "05-period-all.png",
+          "caption": "「全部」下的时间范围与请求列表",
+          "width": 2560
+        }
+      ]
+    }
+  ],
+  "video": "preview.mp4",
+  "poster": "poster.png",
+  "errors": [
+    "用量「请求」：时间范围与 Agent / 供应商筛选 · click #ledProvider: nothing visible matches #ledProvider (1 in the page)"
+  ],
+  "leak": false,
+  "skipped": null,
+  "mismatch": "",
+  "unseen": "沙盒里只配置了 DeepSeek 一个供应商，网关调用也都发生在今天，切换任何时间范围（今天 / 7 天 / 30 天 / 全部）都不会让已选的 Agent 或供应商变得不可用，所以本次修复的核心效果——筛选项自动清空并重新加载请求列表——在沙盒里触发不了（PR 的回归用例用 fixture 造了「Relay」供应商在 30 天有、7 天没有的调用）。画面只能展示「用量 → 请求」的时间范围与筛选器本身，以及切范围时列表正常刷新的路径。",
+  "interactive": true,
+  "pages": 1
+}

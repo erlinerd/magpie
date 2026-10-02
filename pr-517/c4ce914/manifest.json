@@ -1,0 +1,59 @@
+{
+  "summary": "「最少使用」路由的说明文字改了：供应商/路由组编辑器里该选项的提示，以及路由页顶部对该路由方式的描述，都改成按「每周剩余额度 ÷ 距重置的小时数」（重置时损失最多优先）来解释；排序逻辑本身也换成了这一 pace 规则。",
+  "scenes": [
+    {
+      "title": "供应商编辑器里「最少使用」的说明",
+      "shots": [
+        {
+          "file": "01-provider-editor.png",
+          "caption": "DeepSeek 的编辑面板",
+          "width": 2560
+        },
+        {
+          "file": "02-routing-group-editor.png",
+          "caption": "路由组编辑器",
+          "width": 2560
+        },
+        {
+          "file": "03-provider-editor.png",
+          "caption": "DeepSeek 的编辑面板",
+          "width": 2560
+        },
+        {
+          "file": "04-group-editor-routing.png",
+          "caption": "路由组编辑器里的路由选项",
+          "width": 2560
+        },
+        {
+          "file": "05-group-editor-least-used.png",
+          "caption": "选中「最少使用」后编辑器给出的说明",
+          "width": 2560
+        }
+      ]
+    },
+    {
+      "title": "路由页在「最少使用」下的说明",
+      "shots": [
+        {
+          "file": "06-routing-mode-least-used.png",
+          "caption": "路由方式为「最少使用」时，路由页顶部的说明",
+          "width": 2560
+        }
+      ]
+    }
+  ],
+  "video": "preview.mp4",
+  "poster": "poster.png",
+  "errors": [
+    "供应商编辑器里「最少使用」的说明 · click button: nothing visible matches button with \"最少使用\" (0 in the page)",
+    "供应商编辑器里「最少使用」的说明 · click #modal button: nothing visible matches #modal button with \"最少使用\" (0 in the page)",
+    "供应商编辑器里「最少使用」的说明 · click button: nothing visible matches button with \"用量少的优先\" (0 in the page)",
+    "供应商编辑器里「最少使用」的说明 · click button: nothing visible matches button with \"最少使用\" (0 in the page)"
+  ],
+  "leak": false,
+  "skipped": null,
+  "mismatch": "",
+  "unseen": "沙盒里只有 DeepSeek 的 API Key，供应商只报余额、没有 5 小时或每周额度窗口，也没有第二个订阅账号，所以按 pace 排序的实际结果看不到，路由页里「已用 X，N 后重置」那句说明（只在有周额度窗口的订阅账号上出现）也看不到；画面里只能看到路由说明文字的改动。",
+  "interactive": true,
+  "pages": 3
+}

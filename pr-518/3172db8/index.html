@@ -1,0 +1,15 @@
+<!doctype html><html lang="zh"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>#518 界面预览 · 3172db8</title>
+<style>:root{color-scheme:light dark;--bg:#f6f6f7;--fg:#1d1d1f;--muted:#6e6e73;--card:#fff;--line:#e5e5ea}
+@media (prefers-color-scheme:dark){:root{--bg:#111113;--fg:#f2f2f4;--muted:#9a9aa0;--card:#1c1c1f;--line:#2c2c30}}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC","Noto Sans CJK SC",sans-serif}
+main{max-width:1100px;margin:0 auto;padding:28px 16px 60px}h1{font-size:20px;margin:0 0 4px}.m{color:var(--muted);font-size:13px;margin:0 0 20px}
+video,img{display:block;width:100%;border-radius:10px;border:1px solid var(--line);background:var(--card)}figure{margin:0 0 28px}figcaption{color:var(--muted);font-size:13px;margin-top:8px}
+a{color:inherit}</style>
+<main><h1>#518 界面预览</h1><p class="m">commit 3172db8 · <a href="https://github.com/yetone/magpie/pull/518">回到 PR</a> · 这个 diff 改的是 Claude Code 模型下拉（#496 的折叠）的几处行为：折叠行移到 Claude Code 自己那组模型的末尾、展开项紧随其后，不再出现第二个 Claude Code 标题；折叠行按下不再抢走焦点，点完方向键、回车、Esc 照常；搜索框有内容时不折叠、输入的完整模型 ID 回车即可选中；带日期的型号被收藏而别名没被收藏时保留带日期那一行；另外 WSL 发行版里的 Claude Code 不再折叠。</p>
+<figure><video src="preview.mp4" controls autoplay muted playsinline poster="poster.png"></video><figcaption>红线是鼠标走过的轨迹，红色圆环是一次点击；底部文字是这一步在做什么。空格暂停，← → 逐段查看。</figcaption></figure>
+<figure><img src="01-claude-model-picker.png" alt="Claude Code 的模型列表"><figcaption>Claude Code 的模型下拉 · Claude Code 的模型列表</figcaption></figure>
+<figure><img src="02-picker-filtered.png" alt="输入关键词后的模型列表"><figcaption>Claude Code 的模型下拉 · 输入关键词后的模型列表</figcaption></figure>
+<figure><img src="03-picker-full-id.png" alt="输入完整模型 ID 后的模型列表"><figcaption>输入完整模型 ID 后回车 · 输入完整模型 ID 后的模型列表</figcaption></figure>
+<figure><img src="04-picker-picked.png" alt="回车之后 Claude Code 行上的模型字段"><figcaption>输入完整模型 ID 后回车 · 回车之后 Claude Code 行上的模型字段</figcaption></figure>
+</main></html>

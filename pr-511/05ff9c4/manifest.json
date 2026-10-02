@@ -1,0 +1,39 @@
+{
+  "summary": "这个 diff 让 Claude 的 /usage 读不到额度时保留上一次带时间戳的快照：面板的额度卡片和供应商账号行现在会把「截至…（缓存）」直接显示出来，已过的重置时间显示为「重置时间已过」，有窗口过期时补充说明当前额度未知，读到的额度更新后这些标记消失。",
+  "scenes": [
+    {
+      "title": "用量页的额度区",
+      "shots": [
+        {
+          "file": "01-usage-allowance-cards.png",
+          "caption": "用量页的额度区（沙盒中只有 DeepSeek，无 Claude 订阅账号）",
+          "width": 2560
+        },
+        {
+          "file": "02-usage-allowance-after-refresh.png",
+          "caption": "刷新后的额度区",
+          "width": 2560
+        }
+      ]
+    },
+    {
+      "title": "面板的额度页签",
+      "shots": [
+        {
+          "file": "03-panel-allowance-card.png",
+          "caption": "面板额度页签里的额度卡片",
+          "width": 1340
+        }
+      ]
+    }
+  ],
+  "video": "preview.mp4",
+  "poster": "poster.png",
+  "errors": [],
+  "leak": false,
+  "skipped": null,
+  "mismatch": "",
+  "unseen": "沙盒里只有一个 DeepSeek 供应商、只显示余额，没有任何 Claude 订阅账号，也没有带重置时间的订阅窗口，所以「截至 …（缓存）」的过期提示、「重置时间已过」和「当前额度未知」在这里都不会出现；只能展示这些提示会出现的位置。",
+  "interactive": true,
+  "pages": 2
+}

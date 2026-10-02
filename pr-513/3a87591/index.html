@@ -1,0 +1,16 @@
+<!doctype html><html lang="zh"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>#513 界面预览 · 3a87591</title>
+<style>:root{color-scheme:light dark;--bg:#f6f6f7;--fg:#1d1d1f;--muted:#6e6e73;--card:#fff;--line:#e5e5ea}
+@media (prefers-color-scheme:dark){:root{--bg:#111113;--fg:#f2f2f4;--muted:#9a9aa0;--card:#1c1c1f;--line:#2c2c30}}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC","Noto Sans CJK SC",sans-serif}
+main{max-width:1100px;margin:0 auto;padding:28px 16px 60px}h1{font-size:20px;margin:0 0 4px}.m{color:var(--muted);font-size:13px;margin:0 0 20px}
+video,img{display:block;width:100%;border-radius:10px;border:1px solid var(--line);background:var(--card)}figure{margin:0 0 28px}figcaption{color:var(--muted);font-size:13px;margin-top:8px}
+a{color:inherit}</style>
+<main><h1>#513 界面预览</h1><p class="m">commit 3a87591 · <a href="https://github.com/yetone/magpie/pull/513">回到 PR</a> · 用量页「请求」列表的筛选同步逻辑改了：切换时间范围后，如果已选的 Agent 或供应商在新范围里没有请求，magpie 现在会清空这个失效筛选、把分页复位到第一页并重新请求、在新结果返回后重绘列表，而不是像以前那样筛选器显示「全部」但列表仍停留在旧筛选的空结果上（此前只有网关密钥筛选是这么处理的）。</p>
+<figure><video src="preview.mp4" controls autoplay muted playsinline poster="poster.png"></video><figcaption>红线是鼠标走过的轨迹，红色圆环是一次点击；底部文字是这一步在做什么。空格暂停，← → 逐段查看。</figcaption></figure>
+<figure><img src="01-usage-requests.png" alt="「请求」列表上方的时间范围，以及 Agent / 供应商 / 网关密钥三个筛选器"><figcaption>用量「请求」：时间范围与 Agent / 供应商筛选 · 「请求」列表上方的时间范围，以及 Agent / 供应商 / 网关密钥三个筛选器</figcaption></figure>
+<figure><img src="02-usage-requests.png" alt="「请求」标签下的时间范围、搜索框与请求列表"><figcaption>用量「请求」：时间范围与 Agent / 供应商筛选 · 「请求」标签下的时间范围、搜索框与请求列表</figcaption></figure>
+<figure><img src="03-period-7d.png" alt="切到「7 天」后的时间范围与请求列表"><figcaption>用量「请求」：时间范围与 Agent / 供应商筛选 · 切到「7 天」后的时间范围与请求列表</figcaption></figure>
+<figure><img src="04-period-30d.png" alt="「30 天」下的时间范围与请求列表"><figcaption>用量「请求」：时间范围与 Agent / 供应商筛选 · 「30 天」下的时间范围与请求列表</figcaption></figure>
+<figure><img src="05-period-all.png" alt="「全部」下的时间范围与请求列表"><figcaption>用量「请求」：时间范围与 Agent / 供应商筛选 · 「全部」下的时间范围与请求列表</figcaption></figure>
+</main></html>

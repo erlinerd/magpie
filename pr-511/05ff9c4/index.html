@@ -1,0 +1,14 @@
+<!doctype html><html lang="zh"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>#511 界面预览 · 05ff9c4</title>
+<style>:root{color-scheme:light dark;--bg:#f6f6f7;--fg:#1d1d1f;--muted:#6e6e73;--card:#fff;--line:#e5e5ea}
+@media (prefers-color-scheme:dark){:root{--bg:#111113;--fg:#f2f2f4;--muted:#9a9aa0;--card:#1c1c1f;--line:#2c2c30}}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC","Noto Sans CJK SC",sans-serif}
+main{max-width:1100px;margin:0 auto;padding:28px 16px 60px}h1{font-size:20px;margin:0 0 4px}.m{color:var(--muted);font-size:13px;margin:0 0 20px}
+video,img{display:block;width:100%;border-radius:10px;border:1px solid var(--line);background:var(--card)}figure{margin:0 0 28px}figcaption{color:var(--muted);font-size:13px;margin-top:8px}
+a{color:inherit}</style>
+<main><h1>#511 界面预览</h1><p class="m">commit 05ff9c4 · <a href="https://github.com/yetone/magpie/pull/511">回到 PR</a> · 这个 diff 让 Claude 的 /usage 读不到额度时保留上一次带时间戳的快照：面板的额度卡片和供应商账号行现在会把「截至…（缓存）」直接显示出来，已过的重置时间显示为「重置时间已过」，有窗口过期时补充说明当前额度未知，读到的额度更新后这些标记消失。</p>
+<figure><video src="preview.mp4" controls autoplay muted playsinline poster="poster.png"></video><figcaption>红线是鼠标走过的轨迹，红色圆环是一次点击；底部文字是这一步在做什么。空格暂停，← → 逐段查看。</figcaption></figure>
+<figure><img src="01-usage-allowance-cards.png" alt="用量页的额度区（沙盒中只有 DeepSeek，无 Claude 订阅账号）"><figcaption>用量页的额度区 · 用量页的额度区（沙盒中只有 DeepSeek，无 Claude 订阅账号）</figcaption></figure>
+<figure><img src="02-usage-allowance-after-refresh.png" alt="刷新后的额度区"><figcaption>用量页的额度区 · 刷新后的额度区</figcaption></figure>
+<figure><img src="03-panel-allowance-card.png" alt="面板额度页签里的额度卡片"><figcaption>面板的额度页签 · 面板额度页签里的额度卡片</figcaption></figure>
+</main></html>

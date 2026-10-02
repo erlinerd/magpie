@@ -1,0 +1,46 @@
+{
+  "summary": "这个 diff 改的是 Claude Code 模型下拉（#496 的折叠）的几处行为：折叠行移到 Claude Code 自己那组模型的末尾、展开项紧随其后，不再出现第二个 Claude Code 标题；折叠行按下不再抢走焦点，点完方向键、回车、Esc 照常；搜索框有内容时不折叠、输入的完整模型 ID 回车即可选中；带日期的型号被收藏而别名没被收藏时保留带日期那一行；另外 WSL 发行版里的 Claude Code 不再折叠。",
+  "scenes": [
+    {
+      "title": "Claude Code 的模型下拉",
+      "shots": [
+        {
+          "file": "01-claude-model-picker.png",
+          "caption": "Claude Code 的模型列表",
+          "width": 2560
+        },
+        {
+          "file": "02-picker-filtered.png",
+          "caption": "输入关键词后的模型列表",
+          "width": 2560
+        }
+      ]
+    },
+    {
+      "title": "输入完整模型 ID 后回车",
+      "shots": [
+        {
+          "file": "03-picker-full-id.png",
+          "caption": "输入完整模型 ID 后的模型列表",
+          "width": 2560
+        },
+        {
+          "file": "04-picker-picked.png",
+          "caption": "回车之后 Claude Code 行上的模型字段",
+          "width": 1120
+        }
+      ]
+    }
+  ],
+  "video": "preview.mp4",
+  "poster": "poster.png",
+  "errors": [
+    "输入完整模型 ID 后回车 · click button.agent-more: nothing visible matches button.agent-more with \"显示其余\" (0 in the page)"
+  ],
+  "leak": false,
+  "skipped": null,
+  "mismatch": "",
+  "unseen": "沙盒里只有 DeepSeek 一个供应商，没有任何订阅账号（没有 Claude 的登录），也没有 WSL 发行版，所以模型下拉里根本不会出现 magpie 那个 Claude 账号的第二份模型，折叠行、点击折叠行后的键盘行为、搜索时不折叠、带日期的收藏型号这几项在这里都看不到，WSL 里不折叠更是无从显示；只能展示它们会出现的那个模型下拉本身。",
+  "interactive": true,
+  "pages": 1
+}
