@@ -58,8 +58,12 @@ func cliBehind() string {
 		if cliQuiet() {
 			return
 		}
+		cliBehindMu.Lock()
 		cliBehindVal = tilde(cli)
+		cliBehindMu.Unlock()
 	})
+	cliBehindMu.Lock()
+	defer cliBehindMu.Unlock()
 	return cliBehindVal
 }
 
@@ -88,12 +92,15 @@ func cliBehindRoutes(mux *http.ServeMux) {
 			fail(rw, err)
 			return
 		}
+		cliBehindMu.Lock()
 		cliBehindVal = "" // kept away until the next version; the Once already ran
+		cliBehindMu.Unlock()
 		rw.WriteHeader(http.StatusNoContent)
 	})
 }
 
 var cliBehindOnce = new(sync.Once) // a var so tests can ask again
+var cliBehindMu sync.Mutex         // the dismiss handler writes cliBehindVal while state() reads it on other goroutines
 var cliBehindVal string
 
 // Version is the build's version string, shown in Settings.

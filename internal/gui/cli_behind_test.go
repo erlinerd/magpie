@@ -59,6 +59,22 @@ func TestCLIBehindIsLstatOnlyAndDismissible(t *testing.T) {
 		t.Fatalf("dismiss file = %q, %v; want this version, so the next one asks again", b, err)
 	}
 
+	// the dismiss outlives a restart: the copy is still there, but the
+	// quiet file still names this version, so a fresh run stays quiet
+	cliBehindOnce = new(sync.Once)
+	cliBehindVal = ""
+	if got := cliBehind(); got != "" {
+		t.Fatalf("cliBehind = %q after a restart, want empty: the dismiss is kept per version", got)
+	}
+
+	// the next version asks once more
+	Version = "0.1.501"
+	cliBehindOnce = new(sync.Once)
+	cliBehindVal = ""
+	if got := cliBehind(); got != cli {
+		t.Fatalf("cliBehind = %q on the next version, want %q: the dismiss only covers the version it was made at", got, tilde(cli))
+	}
+
 	// a link, not a copy: quiet even undismissed
 	os.Remove(cli)
 	if err := os.Symlink("/Applications/magpie.app/Contents/MacOS/magpie", cli); err != nil {
