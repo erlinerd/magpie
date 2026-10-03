@@ -1668,6 +1668,7 @@ async function load() {
     status(e.message, "err");
   }
   renderUpdateBadge();
+  cliBehindOnce();
   whatsNewOnce();
 }
 
@@ -1831,6 +1832,15 @@ function updateStuck(u) {
 // that one's notes first.
 const ISSUES = "https://github.com/yetone/magpie/issues/";
 let whatsNewAsked = false;
+// cliBehindOnce: the terminal's magpie is a copy a GUI update left behind
+// (#531's lesson: a stale command wedged the WebDAV sync). Say it once per
+// load, and only in the window — the panel is too small for advice.
+let cliBehindAsked = false;
+function cliBehindOnce() {
+  if (cliBehindAsked || mode === "panel") return;
+  cliBehindAsked = true;
+  if (state?.cliBehind) status(t("The `magpie` command at {path} is a copy, not the app's link: it won't follow updates. Run the installer, or `magpie update` in a terminal.", { path: state.cliBehind }), "warn", 9000);
+}
 async function whatsNewOnce() {
   if (whatsNewAsked || mode === "panel" || document.hidden || !$("#modal").hidden) return;
   whatsNewAsked = true;

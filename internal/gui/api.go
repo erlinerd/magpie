@@ -21,6 +21,7 @@ import (
 	"regexp"
 	"slices"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/yetone/magpie/internal/access"
@@ -35,7 +36,25 @@ import (
 	"github.com/yetone/magpie/internal/provider"
 	"github.com/yetone/magpie/internal/redact"
 	"github.com/yetone/magpie/internal/settings"
+	"github.com/yetone/magpie/internal/update"
 )
+
+// cliBehind is the terminal's magpie command when a GUI update left it
+// behind — a copied file, not the installer's link — told once: state()
+// runs after nearly every click, and the answer can't change while the
+// app runs. "" when the command follows the app, isn't there, or this
+// isn't the Mac.
+func cliBehind() string {
+	cliBehindOnce.Do(func() {
+		if stale := update.StaleCLI(); stale != "" {
+			cliBehindVal = tilde(stale)
+		}
+	})
+	return cliBehindVal
+}
+
+var cliBehindOnce sync.Once
+var cliBehindVal string
 
 // Version is the build's version string, shown in Settings.
 var Version = "dev"
@@ -128,12 +147,17 @@ type profileLibraryJSON struct {
 }
 
 type stateJSON struct {
-	Agents   []agentJSON       `json:"agents"`
-	Clients  []clientJSON      `json:"clients"` // who a request may come from, by id
-	Profiles []profileJSON     `json:"profiles"`
-	Catalog  string            `json:"catalog"`
-	Notice   string            `json:"notice,omitempty"` // advice after a change, e.g. "restart Codex"
-	Settings settings.Settings `json:"settings"`
+	Agents   []agentJSON   `json:"agents"`
+	Clients  []clientJSON  `json:"clients"` // who a request may come from, by id
+	Profiles []profileJSON `json:"profiles"`
+	Catalog  string        `json:"catalog"`
+	Notice   string        `json:"notice,omitempty"` // advice after a change, e.g. "restart Codex"
+	// CLIBehind is the terminal's magpie command, told to the user when
+	// it's a copied file that a GUI update left behind: the stale build
+	// that can't follow the app (#531's lesson). "" when it follows, or
+	// there's nothing to say.
+	CLIBehind string            `json:"cliBehind,omitempty"`
+	Settings  settings.Settings `json:"settings"`
 	// FX is the dollar-to-yuan rate the cny currency choice shows costs at,
 	// here too (not only in settingsJSON) so a cost drawn before the reader
 	// ever opens Settings already converts, if cny was chosen last time.
@@ -1000,6 +1024,7 @@ func state() stateJSON {
 		s.FX = currentFX()
 	}
 	s.Unlisted = unlistedModels()
+	s.CLIBehind = cliBehind()
 	for _, a := range agent.Clients() {
 		s.Clients = append(s.Clients, clientJSON{ID: a.ID, Name: a.Name, Icon: a.Icon})
 	}

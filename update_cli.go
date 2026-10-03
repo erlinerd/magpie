@@ -93,6 +93,9 @@ func updateCmd(args []string) error {
 			return err
 		}
 		fmt.Println(green.Render("✓"), "updated", tilde(app), "to", rel.Version, muted.Render("· quit and reopen magpie to use it"))
+		if stale := update.StaleCLI(); stale != "" {
+			fmt.Println(muted.Render("  the `magpie` command at " + tilde(stale) + " is a copy, not the app's link, so it stays behind; run the installer or replace it with the app's binary to keep it current"))
+		}
 		return nil
 	}
 	if exe, err := update.Executable(); err == nil && update.Homebrew(exe) {

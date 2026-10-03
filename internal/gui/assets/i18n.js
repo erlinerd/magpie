@@ -1594,6 +1594,7 @@ const I18N = {
     "Update failed": "更新失败",
     "Hide until the next version": "隐藏，直到下一个版本",
     "Update hidden until the next version; Settings still has it": "已隐藏更新按钮，下一个版本发布时再显示；设置里仍可更新",
+    "The `magpie` command at {path} is a copy, not the app's link: it won't follow updates. Run the installer, or `magpie update` in a terminal.": "终端里的 `magpie` 命令（{path}）是一份拷贝，不是指向应用的链接，不会随更新升级。请重跑安装脚本，或在终端运行 `magpie update`。",
     "Update button": "更新按钮",
     "Shows in the header when a newer magpie is out": "magpie 有新版本时显示在顶栏",
     "Hidden for {v} until a newer version is out": "{v} 已隐藏，更新的版本发布时再显示",
