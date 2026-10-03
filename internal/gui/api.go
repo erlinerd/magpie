@@ -39,14 +39,14 @@ import (
 	"github.com/yetone/magpie/internal/update"
 )
 
-// cliBehind is the terminal's magpie command when a GUI update left it
-// behind — a copied file, not the installer's link — told once: state()
-// runs after nearly every click, and the answer can't change while the
-// app runs. "" when the command follows the app, isn't there, or this
-// isn't the Mac.
+// cliBehind is the terminal's magpie command when it's a copied file behind
+// this app — the stale build that can't follow updates (#531's lesson) —
+// told once: state() runs after nearly every click, and the answer can't
+// change while the app runs. "" when the command follows the app, is at or
+// ahead of it, isn't there, or this isn't the Mac.
 func cliBehind() string {
 	cliBehindOnce.Do(func() {
-		if stale := update.StaleCLI(); stale != "" {
+		if stale := update.StaleCLI(Version); stale != "" {
 			cliBehindVal = tilde(stale)
 		}
 	})

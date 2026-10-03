@@ -16,7 +16,7 @@ const assets = path.resolve(__dirname, "../assets");
 
 const W = {
   en: (p) => `The \`magpie\` command at ${p} is a copy`,
-  zh: (p) => `终端里的 \`magpie\` 命令（${p}）是一份拷贝`,
+  zh: (p) => `终端里的 \`magpie\` 命令（${p}）是一份落后于本应用的拷贝`,
 };
 
 function server(lang, behind) {
@@ -74,7 +74,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
       await ok.goto("http://magpie.test/");
       await ok.waitForTimeout(500);
       assert.equal((await ok.locator("#status").textContent()).trim(), "", "a following command is not mentioned");
-      const key = "The `magpie` command at {path} is a copy, not the app's link: it won't follow updates. Run the installer, or `magpie update` in a terminal.";
+      const key = "The `magpie` command at {path} is a copy behind this app: it won't follow updates. Re-run the installer to link it.";
       const missing = await ok.evaluate((k) => [k].filter((x) => !I18N.zh[x]), key);
       assert.deepEqual(missing, [], "the advice has its Chinese");
       assert.deepEqual(errors, []);

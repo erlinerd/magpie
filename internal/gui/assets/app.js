@@ -1839,7 +1839,7 @@ let cliBehindAsked = false;
 function cliBehindOnce() {
   if (cliBehindAsked || mode === "panel") return;
   cliBehindAsked = true;
-  if (state?.cliBehind) status(t("The `magpie` command at {path} is a copy, not the app's link: it won't follow updates. Run the installer, or `magpie update` in a terminal.", { path: state.cliBehind }), "warn", 9000);
+  if (state?.cliBehind) status(t("The `magpie` command at {path} is a copy behind this app: it won't follow updates. Re-run the installer to link it.", { path: state.cliBehind }), "warn", 9000);
 }
 async function whatsNewOnce() {
   if (whatsNewAsked || mode === "panel" || document.hidden || !$("#modal").hidden) return;
