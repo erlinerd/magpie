@@ -24,17 +24,15 @@ import (
 // reads the copy's version and stays quiet when it is at or ahead of
 // appVersion, or isn't a release at all (a build from source, or one that
 // won't run — none of those is a stale release to nag about). Reading the
-// version runs the old binary, whose start-up migrates things; that's the
-// cost of telling a stale copy from a current one, and it's paid once, only
-// for a file that is a copy in the first place. magpie doesn't rewrite the
-// user's PATH — the fix is theirs: re-run install.sh, or link it by hand,
-// which is what the advice says. Only on the Mac, where the app and the
-// command are two places; on Linux they are one file.
+// version runs the old binary, and that isn't read-only: magpie's start-up
+// runs its migrations before `version` answers. So only `magpie update`,
+// which the user started, asks this — the app's window uses CopiedCLI and
+// its advice can be dismissed instead. magpie doesn't rewrite the user's
+// PATH — the fix is theirs: re-run install.sh, or link it by hand, which is
+// what the advice says. Only on the Mac, where the app and the command are
+// two places; on Linux they are one file.
 func StaleCLI(appVersion string) string {
-	if runtime.GOOS != "darwin" {
-		return ""
-	}
-	cli := copiedCLI()
+	cli := CopiedCLI()
 	if cli == "" {
 		return ""
 	}
@@ -45,11 +43,17 @@ func StaleCLI(appVersion string) string {
 	return cli
 }
 
-// copiedCLI is the command's path when it's a plain copied file rather than
+// CopiedCLI is the command's path when it's a plain copied file rather than
 // install.sh's link, or "" when it's absent, a link, or not a regular file.
-// A bare Lstat: what the command *is* decides whether a version is worth
-// reading at all.
-func copiedCLI() string {
+// A bare Lstat — nothing is run, nothing is written — so the app's window
+// can ask on every launch. It can't tell a stale copy from a current one
+// (that needs the copy's version, which only `magpie update` may read), so
+// what the window says off it is advice with a dismiss, not a warning that
+// knows. Only on the Mac; on Linux the app and the command are one file.
+func CopiedCLI() string {
+	if runtime.GOOS != "darwin" {
+		return ""
+	}
 	bin := os.Getenv("MAGPIE_BIN_DIR")
 	if bin == "" {
 		home := os.Getenv("HOME")

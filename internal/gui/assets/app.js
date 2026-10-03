@@ -1832,14 +1832,38 @@ function updateStuck(u) {
 // that one's notes first.
 const ISSUES = "https://github.com/yetone/magpie/issues/";
 let whatsNewAsked = false;
-// cliBehindOnce: the terminal's magpie is a copy a GUI update left behind
-// (#531's lesson: a stale command wedged the WebDAV sync). Say it once per
-// load, and only in the window — the panel is too small for advice.
+// cliBehindOnce: the terminal's magpie is a copied file rather than the
+// installer's link, so it can't follow the app's updates (#531's lesson: a
+// stale command wedged the WebDAV sync). The window can't tell a stale copy
+// from a current one — that would mean running the old binary, whose
+// start-up migrates settings — so this is advice, shown once per load, only
+// in the window (the panel is too small), and dismissable until the next
+// version.
 let cliBehindAsked = false;
 function cliBehindOnce() {
-  if (cliBehindAsked || mode === "panel") return;
+  if (cliBehindAsked || mode === "panel" || !$("#modal").hidden) return; // another dialog owns the screen: the advice waits for the next load
   cliBehindAsked = true;
-  if (state?.cliBehind) status(t("The `magpie` command at {path} is a copy behind this app: it won't follow updates. Re-run the installer to link it.", { path: state.cliBehind }), "warn", 9000);
+  if (!state?.cliBehind) return;
+  const ed = el("div", "editor");
+  const head = el("div", "ehead");
+  head.append(el("b", "", t("The `magpie` command is a copy")));
+  ed.append(head);
+  ed.append(el("p", "lib-confirm", t("The `magpie` command at {path} is a copied file, not the installer's link to the app: it won't follow the app's updates, and an old copy can break what a new one fixed. Re-run the installer, or link it by hand.", { path: state.cliBehind })));
+  const bar = el("div", "bar");
+  const quiet = el("button", "text", t("Hide until the next version"));
+  quiet.onclick = async (e) => {
+    e.stopPropagation();
+    try { await api("cli-behind/quiet", {}); } catch (err) { return status(err.message, "err"); }
+    closeConfirmAsk();
+  };
+  const ok = el("button", "text primary", t("OK"));
+  ok.onclick = (e) => { e.stopPropagation(); closeConfirmAsk(); };
+  bar.append(el("span", "grow"), quiet, ok);
+  ed.append(bar);
+  confirmAsk = ed;
+  openModal(ed);
+  $("#modal").classList.add("lib");
+  ok.focus({ preventScroll: true });
 }
 async function whatsNewOnce() {
   if (whatsNewAsked || mode === "panel" || document.hidden || !$("#modal").hidden) return;

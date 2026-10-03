@@ -18,6 +18,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"path/filepath"
 	"regexp"
 	"slices"
 	"strings"
@@ -39,21 +40,60 @@ import (
 	"github.com/yetone/magpie/internal/update"
 )
 
-// cliBehind is the terminal's magpie command when it's a copied file behind
-// this app — the stale build that can't follow updates (#531's lesson) —
-// told once: state() runs after nearly every click, and the answer can't
-// change while the app runs. "" when the command follows the app, is at or
-// ahead of it, isn't there, or this isn't the Mac.
+// cliBehind is the terminal's magpie command when it's a copied file rather
+// than the installer's link — a copy can't follow updates (#531's lesson) —
+// told once, and only until the user dismisses it for this version. The
+// check is a bare Lstat: telling a *stale* copy from a current one would
+// mean running the old binary, and `magpie version` isn't read-only — it
+// migrates the user's settings first, with the old build's migrations. Only
+// `magpie update`, which the user started, reads versions (update.StaleCLI).
+// "" when the command is the link or absent, this isn't the Mac, or the
+// advice was dismissed for this version.
 func cliBehind() string {
 	cliBehindOnce.Do(func() {
-		if stale := update.StaleCLI(Version); stale != "" {
-			cliBehindVal = tilde(stale)
+		cli := update.CopiedCLI()
+		if cli == "" {
+			return
 		}
+		if cliQuiet() {
+			return
+		}
+		cliBehindVal = tilde(cli)
 	})
 	return cliBehindVal
 }
 
-var cliBehindOnce sync.Once
+// cliQuiet is whether the advice was dismissed for this version; the
+// dismiss is kept per version, so the next app update asks once more.
+// cliQuietFile holds the version it was dismissed at.
+const cliQuietFile = "cli-behind-quiet"
+
+func cliQuiet() bool {
+	b, err := os.ReadFile(filepath.Join(settings.Dir(), cliQuietFile))
+	return err == nil && strings.TrimSpace(string(b)) == Version
+}
+
+// setCLIQuiet dismisses the advice until the next version.
+func setCLIQuiet() error {
+	if err := os.MkdirAll(settings.Dir(), 0o755); err != nil {
+		return err
+	}
+	return os.WriteFile(filepath.Join(settings.Dir(), cliQuietFile), []byte(Version+"\n"), 0o644)
+}
+
+// cliBehindRoutes serves the advice's "Hide until the next version".
+func cliBehindRoutes(mux *http.ServeMux) {
+	mux.HandleFunc("POST /api/cli-behind/quiet", func(rw http.ResponseWriter, r *http.Request) {
+		if err := setCLIQuiet(); err != nil {
+			fail(rw, err)
+			return
+		}
+		cliBehindVal = "" // kept away until the next version; the Once already ran
+		rw.WriteHeader(http.StatusNoContent)
+	})
+}
+
+var cliBehindOnce = new(sync.Once) // a var so tests can ask again
 var cliBehindVal string
 
 // Version is the build's version string, shown in Settings.
@@ -153,9 +193,9 @@ type stateJSON struct {
 	Catalog  string        `json:"catalog"`
 	Notice   string        `json:"notice,omitempty"` // advice after a change, e.g. "restart Codex"
 	// CLIBehind is the terminal's magpie command, told to the user when
-	// it's a copied file that a GUI update left behind: the stale build
-	// that can't follow the app (#531's lesson). "" when it follows, or
-	// there's nothing to say.
+	// it's a copied file rather than the installer's link: a copy can't
+	// follow updates (#531's lesson). "" when it's the link or absent, or
+	// the advice was dismissed for this version.
 	CLIBehind string            `json:"cliBehind,omitempty"`
 	Settings  settings.Settings `json:"settings"`
 	// FX is the dollar-to-yuan rate the cny currency choice shows costs at,
@@ -677,6 +717,7 @@ func Handler(w Windows, gw *gateway.Server) http.Handler {
 	libraryRoutes(mux, w)
 	updateRoutes(mux, w)
 	whatsNewRoutes(mux)
+	cliBehindRoutes(mux)
 	mux.HandleFunc("GET /api/settings", func(rw http.ResponseWriter, r *http.Request) {
 		access.MigrateLegacyLANKeyBestEffort()
 		writeJSON(rw, settingsState())
