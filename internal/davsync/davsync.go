@@ -816,12 +816,22 @@ func syncOnce(ctx context.Context, c Config, st *state) error {
 		}
 		good := cached(st.Sum) // the version this computer last read whole
 		// The damaged body must be that version cut short — a prefix of it,
-		// which is what a relay that stops a long write leaves. This is what
-		// keeps an out-of-date computer from rebuilding: its cached copy is
-		// an older version, not the one that was damaged, so the body isn't
-		// its prefix and the error stands for a computer that did see the
-		// version now cut short to rebuild it.
-		if good == nil || !bytes.HasPrefix(good, data) {
+		// which is what a relay that stops a long write leaves. But Seal
+		// writes with json.MarshalIndent, so every version starts with the
+		// same constant head up to the salt; a body cut inside that head is a
+		// prefix of every version, including an out-of-date computer's older
+		// cached copy. So the prefix check alone lets that computer rebuild
+		// and drop a newer one's data. Only a body reaching past the random
+		// fields — to the "data" key that follows them — is tied to the one
+		// version it was cut from. Requiring it keeps an out-of-date computer
+		// from rebuilding (its copy isn't the version that broke, so the body
+		// isn't its prefix and the error stands), and a body cut before the
+		// random fields stays an error for every computer, even the one that
+		// saw the good version: better to fail loud than rebuild blind. A
+		// sealed file holds a whole setup — hundreds of bytes at its very
+		// smallest — and a relay cuts a real write deep into the data, well
+		// past "data", so legit rebuilds still go.
+		if good == nil || !bytes.HasPrefix(good, data) || len(data) <= bytes.Index(good, []byte(`"data"`)) {
 			return err
 		}
 		remote, err = backup.Open(good, c.Passphrase)
