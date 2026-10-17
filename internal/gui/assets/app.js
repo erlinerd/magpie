@@ -941,9 +941,13 @@ function profileDetail(p, footed) {
     closeProfileDetail();
     chip?.focus({ preventScroll: true });
   };
+  const rename = el("button", "text pd-rename", t("Rename"));
+  rename.type = "button";
+  rename.title = t("Rename {name}", { name: p.name });
+  rename.onclick = (e) => { e.stopPropagation(); startProfileRename(d, p); };
   head.append(el("span", "pd-name", p.name));
   if (p.inUse) head.append(el("span", "pd-cur", t("In use")));
-  head.append(apply, close);
+  head.append(apply, rename, close);
   if (!footed) d.append(head);
   const groups = p.agents || [];
   if (!groups.length) d.append(el("div", "pd-none", t("No agent settings saved")));
@@ -5428,18 +5432,21 @@ function profileLibrary(l) {
 // changed nothing for that long looked broken. An error puts the list back.
 const profilePending = new Set();
 
-async function profileAction(action, name, update) {
+async function profileAction(action, name, update, to) {
   const before = state.profiles;
   if (action === "delete") state.profiles = before.filter((p) => p.name !== name);
   else if (action === "save" && !before.some((p) => p.name === name)) {
     // where magpie will list it: by name, as Go's sort.Strings has them
     state.profiles = [...before, { name, summary: "" }].sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+  } else if (action === "rename") {
+    // the old name goes, the new one in, where magpie will list it by name
+    state.profiles = [...before.filter((p) => p.name !== name), { name: to, summary: "" }].sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
   }
   if (action !== "delete") profilePending.add(name);
   renderProfiles();
   fit();
   try {
-    const data = await api("profile/" + action, { name });
+    const data = await api("profile/" + action, action === "rename" ? { name, to } : { name });
     profilePending.delete(name);
     state = data;
     renderAgents();
@@ -5456,6 +5463,7 @@ async function profileAction(action, name, update) {
       else status(msg, "ok", lib?.missing?.length ? 6000 : 3500);
     }
     else if (action === "save") status(t(update ? "Updated {name} to the current setup" : "Saved {name}", { name }), "ok");
+    else if (action === "rename") { renderProfiles(); status(t("Renamed {name} to {new}", { name, new: to }), "ok"); }
     else status(t("Deleted {name}", { name }));
   } catch (e) {
     profilePending.delete(name);
@@ -5464,6 +5472,30 @@ async function profileAction(action, name, update) {
     fit();
     status(e.message, "err");
   }
+}
+
+// startProfileRename turns the detail panel's name into a field prefilled
+// with it: Enter renames, Escape puts the name back. The rename itself is
+// profileAction's, so its pending and error rollback hold. Validation is on
+// the backend; a rejected rename rolls the list back and the error shows.
+function startProfileRename(d, p) {
+  const nameEl = d.querySelector(".pd-name");
+  if (!nameEl) return;
+  const input = el("input", "pd-rename-input");
+  input.value = p.name;
+  nameEl.replaceWith(input);
+  input.focus();
+  input.select();
+  const cancel = () => input.replaceWith(nameEl);
+  input.onkeydown = (e) => {
+    e.stopPropagation();
+    if (e.key === "Enter") {
+      const to = input.value.trim();
+      if (to && to !== p.name) profileAction("rename", p.name, false, to);
+      else cancel();
+    } else if (e.key === "Escape") cancel();
+  };
+  input.onblur = () => setTimeout(cancel, 100);
 }
 
 // ＋ Save current opens a name field beside it, and the button is Save; a

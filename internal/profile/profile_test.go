@@ -204,3 +204,72 @@ func TestApplySkipsUndetectedAgents(t *testing.T) {
 		t.Error(err)
 	}
 }
+
+// Rename moves a profile's key without re-snapshotting it: the setup it
+// holds is unchanged under the new name (#2721).
+func TestRename(t *testing.T) {
+	sandbox(t)
+	p := Profile{Fields: map[string]string{"codex.model": "gpt-5"}, Library: &library.Setup{}}
+	if err := Save("work", p); err != nil {
+		t.Fatal(err)
+	}
+	// success: the key moves, the contents stay
+	if err := Rename("work", "home"); err != nil {
+		t.Fatal(err)
+	}
+	ps := must[map[string]Profile](t)(Load())
+	if _, ok := ps["work"]; ok {
+		t.Error("old name still present")
+	}
+	if got, ok := ps["home"]; !ok {
+		t.Fatal("new name missing")
+	} else if got.Fields["codex.model"] != "gpt-5" || got.Library == nil {
+		t.Errorf("renamed profile lost its contents: %+v", got)
+	}
+	// trimming both sides
+	if err := Rename("  home  ", "  desk  "); err != nil {
+		t.Fatal(err)
+	}
+	ps = must[map[string]Profile](t)(Load())
+	if _, ok := ps["desk"]; !ok {
+		t.Fatal("trimmed rename didn't write the trimmed name")
+	}
+	// empty new name
+	if err := Rename("desk", "   "); err == nil || err.Error() != "profile name is empty" {
+		t.Errorf("empty new name: %v", err)
+	}
+	// renaming onto a name that is taken
+	if err := Save("taken", Profile{Fields: map[string]string{"claude.model": "acme/m1"}}); err != nil {
+		t.Fatal(err)
+	}
+	if err := Rename("desk", "taken"); err == nil || err.Error() != `a profile named "taken" already exists` {
+		t.Errorf("rename onto taken: %v", err)
+	}
+	// renaming a name that does not exist
+	if err := Rename("nope", "new"); err == nil || err.Error() != `no profile named "nope"` {
+		t.Errorf("rename missing: %v", err)
+	}
+	// renaming to the same name (case included) writes nothing
+	if err := Rename("desk", "desk"); err != nil {
+		t.Errorf("rename to self: %v", err)
+	}
+	if err := Rename("desk", "Desk"); err != nil {
+		t.Errorf("rename to self by case: %v", err)
+	}
+	ps = must[map[string]Profile](t)(Load())
+	if _, ok := ps["desk"]; !ok {
+		t.Error("case-only rename dropped the profile")
+	}
+	// a Load failure writes nothing: make Path a directory so edit.Read errors
+	sandbox(t)
+	if err := os.MkdirAll(Path(), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	before := read(t, Path())
+	if err := Rename("desk", "moved"); err == nil {
+		t.Error("rename over an unreadable file should fail")
+	}
+	if got := read(t, Path()); got != before {
+		t.Errorf("Load failure wrote the file: before=%q after=%q", before, got)
+	}
+}
